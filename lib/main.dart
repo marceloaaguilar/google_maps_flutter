@@ -5,12 +5,16 @@ import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'unidades.dart';
+import 'dart:math' as math;
+
 
 void main() {
   runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -26,13 +30,15 @@ class MyApp extends StatelessWidget {
 }
 
 class MyMapWidget extends StatefulWidget {
+  const MyMapWidget({super.key});
+
   @override
   _MyMapWidgetState createState() => _MyMapWidgetState();
 }
 
 class _MyMapWidgetState extends State<MyMapWidget> {
-  LatLng _userLocation = LatLng(0.0, 0.0);
-  LatLng _lastLocation = LatLng(0.0, 0.0);
+  LatLng _userLocation = const LatLng(0.0, 0.0);
+  LatLng _lastLocation = const LatLng(0.0, 0.0);
   bool _locationFetched = false;
   final MapController _mapController = MapController();
 
@@ -43,7 +49,7 @@ class _MyMapWidgetState extends State<MyMapWidget> {
     serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!serviceEnabled) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Serviço de localização desabilitado. Ative-o e tente novamente.")),
+        const SnackBar(content: Text("Serviço de localização desabilitado. Ative-o e tente novamente.")),
       );
       return;
     }
@@ -53,7 +59,7 @@ class _MyMapWidgetState extends State<MyMapWidget> {
       permission = await Geolocator.requestPermission();
       if (permission == LocationPermission.denied) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Permissão de localização negada.")),
+          const SnackBar(content: Text("Permissão de localização negada.")),
         );
         return;
       }
@@ -61,7 +67,7 @@ class _MyMapWidgetState extends State<MyMapWidget> {
 
     if (permission == LocationPermission.deniedForever) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Permissão de localização permanentemente negada.")),
+        const SnackBar(content: Text("Permissão de localização permanentemente negada.")),
       );
       return;
     }
@@ -124,7 +130,7 @@ class _MyMapWidgetState extends State<MyMapWidget> {
         );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Erro ao comunicar com o servidor.")),
+          const SnackBar(content: Text("Erro ao comunicar com o servidor.")),
         );
       }
     } catch (e) {
@@ -144,7 +150,7 @@ class _MyMapWidgetState extends State<MyMapWidget> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Unidades PUC Minas'),
+        title: const Text('Unidades PUC Minas'),
       ),
       body: Stack(
         children: [
@@ -153,7 +159,7 @@ class _MyMapWidgetState extends State<MyMapWidget> {
             options: MapOptions(
               initialCenter: _locationFetched
                   ? _userLocation
-                  : LatLng(-19.9191, -43.9378),
+                  : const LatLng(-19.9191, -43.9378),
               initialZoom: 13.0,
             ),
             children: [
@@ -168,7 +174,7 @@ class _MyMapWidgetState extends State<MyMapWidget> {
                       point: _userLocation,
                       width: 30.0,
                       height: 30.0,
-                      child: Icon(
+                      child: const Icon(
                         Icons.location_pin,
                         color: Colors.red,
                         size: 40.0,
@@ -190,7 +196,7 @@ class _MyMapWidgetState extends State<MyMapWidget> {
               },
               child: ElevatedButton(
                 onPressed: () {},
-                child: Text("Ver Unidades"),
+                child: const Text("Ver Unidades"),
               ),
             ),
           ),
