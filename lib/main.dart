@@ -32,7 +32,7 @@ class MyMapWidget extends StatefulWidget {
 
 class _MyMapWidgetState extends State<MyMapWidget> {
   LatLng _userLocation = LatLng(0.0, 0.0);
-  LatLng _lastLocation = LatLng(0.0, 0.0); // Última localização rastreada
+  LatLng _lastLocation = LatLng(0.0, 0.0);
   bool _locationFetched = false;
   final MapController _mapController = MapController();
 
@@ -90,7 +90,7 @@ class _MyMapWidgetState extends State<MyMapWidget> {
   }
 
   double _calculateDistance(LatLng start, LatLng end) {
-    const double R = 6371000; // Raio da Terra em metros
+    const double R = 6371000;
     final double lat1 = start.latitude * (3.141592653589793 / 180);
     final double lat2 = end.latitude * (3.141592653589793 / 180);
     final double dLat = (end.latitude - start.latitude) * (3.141592653589793 / 180);
@@ -102,11 +102,11 @@ class _MyMapWidgetState extends State<MyMapWidget> {
         (math.sin(dLon / 2) * math.sin(dLon / 2));
 
     final double c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a));
-    return R * c; // Distância em metros
+    return R * c;
   }
 
   Future<void> _sendLocationToGCF(LatLng location) async {
-    final url = Uri.parse("URL_DA_SUA_FUNCTION"); // Substitua pela URL gerada no deploy
+    final url = Uri.parse("https://us-central1-temporal-storm-444117-e4.cloudfunctions.net/pucminas-check-location");
     try {
       final response = await http.post(
         url,
