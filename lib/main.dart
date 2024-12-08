@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 import 'unidades.dart';
 
 void main() {
@@ -31,6 +32,7 @@ class MyMapWidget extends StatefulWidget {
 
 class _MyMapWidgetState extends State<MyMapWidget> {
   LatLng _userLocation = LatLng(0.0, 0.0);
+  LatLng _lastLocation = LatLng(0.0, 0.0); // Última localização rastreada
   bool _locationFetched = false;
   final MapController _mapController = MapController();
 
@@ -38,7 +40,6 @@ class _MyMapWidgetState extends State<MyMapWidget> {
     bool serviceEnabled;
     LocationPermission permission;
 
-    // Verifica se os serviços de localização estão habilitados
     serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!serviceEnabled) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -47,7 +48,6 @@ class _MyMapWidgetState extends State<MyMapWidget> {
       return;
     }
 
-    // Verifica e solicita permissões de localização
     permission = await Geolocator.checkPermission();
     if (permission == LocationPermission.denied) {
       permission = await Geolocator.requestPermission();
@@ -66,7 +66,6 @@ class _MyMapWidgetState extends State<MyMapWidget> {
       return;
     }
 
-    // Obtém a localização atual com maior precisão possível
     try {
       Position position = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high,
@@ -77,10 +76,60 @@ class _MyMapWidgetState extends State<MyMapWidget> {
         _locationFetched = true;
       });
 
+      if (_calculateDistance(_lastLocation, _userLocation) >= 100) {
+        _lastLocation = _userLocation;
+        await _sendLocationToGCF(_userLocation);
+      }
+
       _mapController.move(_userLocation, 18);
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("Erro ao obter localização: $e")),
+      );
+    }
+  }
+
+  double _calculateDistance(LatLng start, LatLng end) {
+    const double R = 6371000; // Raio da Terra em metros
+    final double lat1 = start.latitude * (3.141592653589793 / 180);
+    final double lat2 = end.latitude * (3.141592653589793 / 180);
+    final double dLat = (end.latitude - start.latitude) * (3.141592653589793 / 180);
+    final double dLon = (end.longitude - start.longitude) * (3.141592653589793 / 180);
+
+    final double a =
+        (math.sin(dLat / 2) * math.sin(dLat / 2)) +
+        math.cos(lat1) * math.cos(lat2) *
+        (math.sin(dLon / 2) * math.sin(dLon / 2));
+
+    final double c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a));
+    return R * c; // Distância em metros
+  }
+
+  Future<void> _sendLocationToGCF(LatLng location) async {
+    final url = Uri.parse("URL_DA_SUA_FUNCTION"); // Substitua pela URL gerada no deploy
+    try {
+      final response = await http.post(
+        url,
+        headers: {"Content-Type": "application/json"},
+        body: json.encode({
+          "latitude": location.latitude,
+          "longitude": location.longitude,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        final message = json.decode(response.body)["message"];
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(message)),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Erro ao comunicar com o servidor.")),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Erro na conexão com o servidor: $e")),
       );
     }
   }
@@ -95,7 +144,7 @@ class _MyMapWidgetState extends State<MyMapWidget> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Flutter Map Example'),
+        title: Text('Unidades PUC Minas'),
       ),
       body: Stack(
         children: [
@@ -133,59 +182,17 @@ class _MyMapWidgetState extends State<MyMapWidget> {
             bottom: 10,
             left: 10,
             child: GestureDetector(
-              onTap: () async {
-                final url = Uri.parse('https://openstreetmap.org/copyright');
-                if (await canLaunchUrl(url)) {
-                  await launchUrl(url, mode: LaunchMode.externalApplication);
-                }
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => Unidades()),
+                );
               },
-              child: Text(
-                '© OpenStreetMap contributors',
-                style: TextStyle(
-                  color: Colors.blue,
-                  fontSize: 12,
-                ),
+              child: ElevatedButton(
+                onPressed: () {},
+                child: Text("Ver Unidades"),
               ),
             ),
-          ),
-          // Aqui está o ElevatedButtonExample
-          Positioned(
-            bottom: 80,
-            right: 10,
-            child: ElevatedButtonExample(),
-          ),
-        ],
-      ),
-    );
-  }
-
-}
-
-class ElevatedButtonExample extends StatefulWidget {
-  const ElevatedButtonExample({super.key});
-
-  @override
-  State<ElevatedButtonExample> createState() => _ElevatedButtonExampleState();
-}
-
-class _ElevatedButtonExampleState extends State<ElevatedButtonExample> {
-  @override
-  Widget build(BuildContext context) {
-    final ButtonStyle style =
-    ElevatedButton.styleFrom(textStyle: const TextStyle(fontSize: 20));
-
-    return Center(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: <Widget>[
-          const SizedBox(height: 30),
-          ElevatedButton(
-            style: style,
-            onPressed: () {Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => Unidades()),
-            );},
-            child: const Text('Ver unidades'),
           ),
         ],
       ),
