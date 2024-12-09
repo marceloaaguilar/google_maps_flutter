@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 class Unidades extends StatelessWidget {
+
   final List<Map<String, String>> unidades = [
     {
       "nome": "Barreiro",
@@ -23,16 +24,22 @@ class Unidades extends StatelessWidget {
       "endereco": "Rua Cláudio Manoel, 1.162 - Bairro Savassi - Lourdes",
     },
     {
+      "nome": "Poços de Caldas",
+      "endereco": "Av. Padre Cletus Francis Cox, 1661 - Jardim Country Club, Poços de Caldas",
+    },
+    {
       "nome": "São Gabriel",
       "endereco": "Anel Rodoviário Km 23,5 - Rua Walter Ianni, 255 - São Gabriel",
     },
   ];
 
+  Unidades({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Unidades PUC Minas'),
+        title: const Text('Unidades PUC Minas'),
         backgroundColor: Colors.blueAccent,
       ),
       body: Padding(
@@ -51,16 +58,16 @@ class Unidades extends StatelessWidget {
                   children: [
                     Text(
                       unidade["nome"]!,
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
                         color: Colors.blueAccent,
                       ),
                     ),
-                    SizedBox(height: 8),
+                    const SizedBox(height: 8),
                     Text(
                       unidade["endereco"]!,
-                      style: TextStyle(fontSize: 16, color: Colors.black54),
+                      style: const TextStyle(fontSize: 16, color: Colors.black54),
                     ),
                   ],
                 ),
