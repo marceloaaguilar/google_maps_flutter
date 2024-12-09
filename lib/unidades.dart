@@ -24,6 +24,10 @@ class Unidades extends StatelessWidget {
       "endereco": "Rua Cláudio Manoel, 1.162 - Bairro Savassi - Lourdes",
     },
     {
+      "nome": "Poços de Caldas",
+      "endereco": "Av. Padre Cletus Francis Cox, 1661 - Jardim Country Club, Poços de Caldas",
+    },
+    {
       "nome": "São Gabriel",
       "endereco": "Anel Rodoviário Km 23,5 - Rua Walter Ianni, 255 - São Gabriel",
     },

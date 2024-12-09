@@ -113,6 +113,7 @@ class _MyMapWidgetState extends State<MyMapWidget> {
 
   Future<void> _sendLocationToGCF(LatLng location) async {
     final url = Uri.parse("https://us-central1-temporal-storm-444117-e4.cloudfunctions.net/pucminas-check-location");
+
     try {
       final response = await http.post(
         url,
@@ -187,17 +188,15 @@ class _MyMapWidgetState extends State<MyMapWidget> {
           Positioned(
             bottom: 10,
             left: 10,
-            child: GestureDetector(
-              onTap: () {
+            child: ElevatedButton(
+              onPressed: () {
+                // Navegar para a tela de unidades
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => Unidades()),
                 );
               },
-              child: ElevatedButton(
-                onPressed: () {},
-                child: const Text("Ver Unidades"),
-              ),
+              child: const Text("Ver Unidades"),
             ),
           ),
         ],
